@@ -47,7 +47,7 @@ async function searchToEdit() {
     toggleLoading(true, "Searching database...");
     
     try {
-        const { data, error } = await _supabase
+        const { data, error } = await supabase
             .from('students')
             .select('*')
             .eq('access_code', lrnInput)
@@ -116,9 +116,9 @@ async function uploadData() {
     try {
         let result;
         if (isEditMode) {
-            result = await _supabase.from('students').update(payload).eq('access_code', studentLrn);
+            result = await supabase.from('students').update(payload).eq('access_code', studentLrn);
         } else {
-            result = await _supabase.from('students').insert([payload]);
+            result = await supabase.from('students').insert([payload]);
         }
 
         if (result.error) throw result.error;
@@ -140,7 +140,7 @@ async function deleteRecord() {
 
     toggleLoading(true, "Deleting record...");
     try {
-        const { error } = await _supabase.from('students').delete().eq('access_code', lrn);
+        const { error } = await supabase.from('students').delete().eq('access_code', lrn);
         if (error) throw error;
         
         showToast("Record deleted successfully");
