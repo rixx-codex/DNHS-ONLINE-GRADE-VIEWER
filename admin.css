@@ -498,6 +498,426 @@ button {
     display: block;
 }
 
+/* --- CHANGE PASSWORD MODAL --- */
+.cp-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(8, 13, 23, 0.9);
+    backdrop-filter: blur(12px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 11000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cp-modal-overlay:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+}
+
+.cp-modal-content {
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.95));
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 35px;
+    width: 90%;
+    max-width: 440px;
+    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8), 0 0 40px var(--primary-glow);
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.cp-modal-overlay:not(.hidden) .cp-modal-content {
+    transform: scale(1) translateY(0);
+}
+
+.cp-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cp-close-btn:hover {
+    background: rgba(255, 75, 43, 0.15);
+    border-color: rgba(255, 75, 43, 0.3);
+    color: var(--danger);
+    transform: rotate(90deg);
+}
+
+.cp-modal-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.cp-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(0, 210, 255, 0.15), rgba(58, 123, 213, 0.15));
+    border: 1px solid rgba(0, 210, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    box-shadow: 0 0 30px var(--primary-glow);
+    animation: cpIconPulse 3s ease-in-out infinite;
+}
+
+@keyframes cpIconPulse {
+    0%, 100% { box-shadow: 0 0 30px var(--primary-glow); }
+    50% { box-shadow: 0 0 40px rgba(0, 210, 255, 0.6); }
+}
+
+.cp-icon-wrapper i {
+    font-size: 2rem;
+    color: var(--primary);
+}
+
+.cp-modal-header h3 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 8px;
+}
+
+.cp-modal-header p {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+}
+
+.cp-form {
+    margin-bottom: 25px;
+}
+
+.cp-input-group {
+    margin-bottom: 18px;
+}
+
+.cp-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.cp-input-wrapper i:first-child {
+    position: absolute;
+    left: 16px;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    z-index: 1;
+}
+
+.cp-input-wrapper input {
+    width: 100%;
+    padding: 16px 50px 16px 45px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    color: #fff;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.cp-input-wrapper input:focus {
+    border-color: var(--primary);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 0 20px var(--primary-glow);
+    outline: none;
+}
+
+.cp-input-wrapper label {
+    position: absolute;
+    left: 45px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    pointer-events: none;
+    transition: 0.3s;
+    background: transparent;
+    padding: 0;
+}
+
+.cp-input-wrapper input:focus ~ label,
+.cp-input-wrapper input:not(:placeholder-shown) ~ label {
+    top: -10px;
+    left: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--primary);
+    background: #1e293b;
+    padding: 2px 10px;
+    border-radius: 4px;
+}
+
+.cp-toggle-password {
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    padding: 8px;
+    transition: color 0.3s ease;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cp-toggle-password:hover {
+    color: var(--primary);
+}
+
+.cp-password-strength {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.strength-bar {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.strength-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+}
+
+.strength-text {
+    font-size: 0.75rem;
+    font-weight: 600;
+    min-width: 55px;
+    text-align: right;
+    transition: color 0.3s ease;
+}
+
+.cp-password-match {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.cp-password-match.active {
+    display: flex;
+}
+
+.cp-password-match.match {
+    color: #10b981;
+}
+
+.cp-password-match.mismatch {
+    color: #ef4444;
+}
+
+.cp-requirements {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 25px;
+}
+
+.req-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cp-requirements ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.cp-requirements li {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.3s ease;
+}
+
+.cp-requirements li i {
+    font-size: 0.6rem;
+    transition: color 0.3s ease;
+}
+
+.cp-modal-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.cp-btn-cancel,
+.cp-btn-update {
+    flex: 1;
+    padding: 14px 20px;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.cp-btn-cancel {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-dim);
+    border: 1px solid var(--glass-border);
+}
+
+.cp-btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.cp-btn-update {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    box-shadow: 0 4px 20px var(--primary-glow);
+}
+
+.cp-btn-update:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px var(--primary-glow);
+}
+
+.cp-btn-update:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.cp-message {
+    margin-top: 15px;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    text-align: center;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.cp-message:not(:empty) {
+    display: flex;
+    animation: cpMessageSlide 0.3s ease;
+}
+
+@keyframes cpMessageSlide {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.cp-message-success {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #10b981;
+}
+
+.cp-message-error {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+/* Top Bar Actions */
+.top-bar-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.change-password-btn {
+    background: rgba(0, 210, 255, 0.1);
+    color: var(--primary);
+    border: 1px solid rgba(0, 210, 255, 0.2);
+    padding: 8px 15px;
+    border-radius: 10px;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    position: relative;
+    z-index: 100;
+    opacity: 1;
+    visibility: visible;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+}
+
+.change-password-btn:hover {
+    background: var(--primary);
+    color: #080d17;
+}
+
+.change-password-btn i {
+    font-size: 0.7rem;
+}
+
+@media (max-width: 480px) {
+    .top-bar-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .change-password-btn,
+    .logout-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .cp-requirements ul {
+        grid-template-columns: 1fr;
+    }
+}
+
 .reset-message.success {
     background: rgba(16, 185, 129, 0.15);
     color: var(--accent);
