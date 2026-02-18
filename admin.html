@@ -88,6 +88,82 @@
             </div>
         </div>
 
+        <!-- Change Password Modal -->
+        <div id="changePasswordModal" class="cp-modal-overlay hidden">
+            <div class="cp-modal-content">
+                <button class="cp-close-btn" onclick="closeChangePasswordModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <div class="cp-modal-header">
+                    <div class="cp-icon-wrapper">
+                        <i class="fa-solid fa-shield-keyhole"></i>
+                    </div>
+                    <h3>Update Password</h3>
+                    <p>Create a strong password to secure your account</p>
+                </div>
+                <div class="cp-form">
+                    <div class="cp-input-group">
+                        <div class="cp-input-wrapper">
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" id="currentPassword" placeholder=" " autocomplete="current-password">
+                            <label>Current Password</label>
+                            <button type="button" class="cp-toggle-password" onclick="toggleCpPassword('currentPassword', 'currentPwIcon')">
+                                <i id="currentPwIcon" class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="cp-input-group">
+                        <div class="cp-input-wrapper">
+                            <i class="fa-solid fa-key"></i>
+                            <input type="password" id="newPassword" placeholder=" " autocomplete="new-password" oninput="checkPasswordStrength()">
+                            <label>New Password</label>
+                            <button type="button" class="cp-toggle-password" onclick="toggleCpPassword('newPassword', 'newPwIcon')">
+                                <i id="newPwIcon" class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="cp-password-strength">
+                            <div class="strength-bar">
+                                <div class="strength-fill" id="strengthFill"></div>
+                            </div>
+                            <span class="strength-text" id="strengthText">Enter password</span>
+                        </div>
+                    </div>
+                    <div class="cp-input-group">
+                        <div class="cp-input-wrapper">
+                            <i class="fa-solid fa-check-double"></i>
+                            <input type="password" id="confirmPassword" placeholder=" " autocomplete="new-password">
+                            <label>Confirm New Password</label>
+                            <button type="button" class="cp-toggle-password" onclick="toggleCpPassword('confirmPassword', 'confirmPwIcon')">
+                                <i id="confirmPwIcon" class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="cp-password-match" id="passwordMatch">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span>Passwords match</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="cp-requirements">
+                    <div class="req-title"><i class="fa-solid fa-list-check"></i> Password Requirements</div>
+                    <ul>
+                        <li id="req-length"><i class="fa-solid fa-circle"></i> At least 8 characters</li>
+                        <li id="req-upper"><i class="fa-solid fa-circle"></i> One uppercase letter</li>
+                        <li id="req-lower"><i class="fa-solid fa-circle"></i> One lowercase letter</li>
+                        <li id="req-number"><i class="fa-solid fa-circle"></i> One number</li>
+                    </ul>
+                </div>
+                <div class="cp-modal-actions">
+                    <button class="cp-btn-cancel" onclick="closeChangePasswordModal()">
+                        <i class="fa-solid fa-xmark"></i> Cancel
+                    </button>
+                    <button class="cp-btn-update" onclick="handlePasswordUpdate()">
+                        <i class="fa-solid fa-check"></i> Update Password
+                    </button>
+                </div>
+                <div id="cpMessage" class="cp-message"></div>
+            </div>
+        </div>
+
         <div id="encoderSection" class="admin-card hidden">
             
             <div class="top-bar">
@@ -98,9 +174,14 @@
                     <span id="adminIdDisplay">...</span>
                     </p>
                 </div>
-                <button class="logout-btn" onclick="handleLogout()">
-                    <i class="fa-solid fa-right-from-bracket"></i> LOGOUT
-                </button>
+                <div class="top-bar-actions">
+                    <button class="change-password-btn" onclick="openChangePasswordModal()">
+                        <i class="fa-solid fa-key"></i> CHANGE PASSWORD
+                    </button>
+                    <button class="logout-btn" onclick="handleLogout()">
+                        <i class="fa-solid fa-right-from-bracket"></i> LOGOUT
+                    </button>
+                </div>
             </div>
 
             <div class="search-section">
@@ -176,6 +257,368 @@
                 deleteRecord();
             }
         }
+
+        // Change Password Modal Functions
+        function openChangePasswordModal() {
+            try {
+                const modal = document.getElementById('changePasswordModal');
+                if (!modal) {
+                    console.error('Modal element not found');
+                    return;
+                }
+                
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+                
+                // Reset form
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+                
+                // Reset strength indicator
+                const strengthFill = document.getElementById('strengthFill');
+                const strengthText = document.getElementById('strengthText');
+                if (strengthFill) strengthFill.style.width = '0%';
+                if (strengthText) {
+                    strengthText.textContent = 'Enter password';
+                    strengthText.style.color = '#94a3b8';
+                }
+                
+                // Reset requirements
+                const requirements = ['req-length', 'req-upper', 'req-lower', 'req-number'];
+                requirements.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        const i = el.querySelector('i');
+                        if (i) {
+                            i.className = 'fa-solid fa-circle';
+                            i.style.color = '';
+                        }
+                    }
+                });
+                
+                // Reset match indicator
+                const matchEl = document.getElementById('passwordMatch');
+                if (matchEl) {
+                    matchEl.classList.remove('active', 'match', 'mismatch');
+                }
+                
+                // Reset message
+                const msgEl = document.getElementById('cpMessage');
+                if (msgEl) {
+                    msgEl.className = 'cp-message';
+                    msgEl.innerHTML = '';
+                }
+                
+                // Focus on first input
+                setTimeout(() => {
+                    const currentPw = document.getElementById('currentPassword');
+                    if (currentPw) currentPw.focus();
+                }, 100);
+                
+            } catch (error) {
+                console.error('Error opening modal:', error);
+            }
+        }
+
+        function closeChangePasswordModal() {
+            try {
+                const modal = document.getElementById('changePasswordModal');
+                if (modal) {
+                    modal.classList.add('hidden');
+                }
+                document.body.style.overflow = '';
+                
+                // Clear message
+                const msgEl = document.getElementById('cpMessage');
+                if (msgEl) {
+                    msgEl.className = 'cp-message';
+                    msgEl.innerHTML = '';
+                }
+            } catch (error) {
+                console.error('Error closing modal:', error);
+            }
+        }
+
+        function toggleCpPassword(inputId, iconId) {
+            try {
+                const input = document.getElementById(inputId);
+                const icon = document.getElementById(iconId);
+                
+                if (!input || !icon) {
+                    console.error('Password toggle elements not found:', inputId, iconId);
+                    return;
+                }
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            } catch (error) {
+                console.error('Error toggling password visibility:', error);
+            }
+        }
+
+        function checkPasswordStrength() {
+            try {
+                const password = document.getElementById('newPassword').value;
+                const strengthFill = document.getElementById('strengthFill');
+                const strengthText = document.getElementById('strengthText');
+                
+                const reqLength = document.getElementById('req-length');
+                const reqUpper = document.getElementById('req-upper');
+                const reqLower = document.getElementById('req-lower');
+                const reqNumber = document.getElementById('req-number');
+                
+                if (!password || !strengthFill || !strengthText || !reqLength || !reqUpper || !reqLower || !reqNumber) {
+                    return;
+                }
+                
+                let strength = 0;
+                
+                // Check requirements
+                const hasLength = password.length >= 8;
+                const hasUpper = /[A-Z]/.test(password);
+                const hasLower = /[a-z]/.test(password);
+                const hasNumber = /[0-9]/.test(password);
+                
+                const reqLengthI = reqLength.querySelector('i');
+                const reqUpperI = reqUpper.querySelector('i');
+                const reqLowerI = reqLower.querySelector('i');
+                const reqNumberI = reqNumber.querySelector('i');
+                
+                if (reqLengthI) {
+                    reqLengthI.className = hasLength ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle';
+                    reqLengthI.style.color = hasLength ? '#10b981' : '';
+                }
+                
+                if (reqUpperI) {
+                    reqUpperI.className = hasUpper ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle';
+                    reqUpperI.style.color = hasUpper ? '#10b981' : '';
+                }
+                
+                if (reqLowerI) {
+                    reqLowerI.className = hasLower ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle';
+                    reqLowerI.style.color = hasLower ? '#10b981' : '';
+                }
+                
+                if (reqNumberI) {
+                    reqNumberI.className = hasNumber ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle';
+                    reqNumberI.style.color = hasNumber ? '#10b981' : '';
+                }
+                
+                if (hasLength) strength++;
+                if (hasUpper) strength++;
+                if (hasLower) strength++;
+                if (hasNumber) strength++;
+                
+                const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e'];
+                const texts = ['Weak', 'Fair', 'Good', 'Strong'];
+                
+                if (password.length === 0) {
+                    strengthFill.style.width = '0%';
+                    strengthFill.style.backgroundColor = 'transparent';
+                    strengthText.textContent = 'Enter password';
+                    strengthText.style.color = '#94a3b8';
+                } else {
+                    strengthFill.style.width = (strength * 25) + '%';
+                    strengthFill.style.backgroundColor = colors[strength - 1] || colors[0];
+                    strengthText.textContent = texts[strength - 1] || texts[0];
+                    strengthText.style.color = colors[strength - 1] || colors[0];
+                }
+                
+                updatePasswordMatch();
+            } catch (error) {
+                console.error('Error checking password strength:', error);
+            }
+        }
+
+        function updatePasswordMatch() {
+            const newPw = document.getElementById('newPassword').value;
+            const confirmPw = document.getElementById('confirmPassword').value;
+            const matchEl = document.getElementById('passwordMatch');
+            
+            if (confirmPw.length === 0) {
+                matchEl.classList.remove('active', 'match', 'mismatch');
+            } else if (newPw === confirmPw && newPw.length > 0) {
+                matchEl.classList.add('active', 'match');
+                matchEl.classList.remove('mismatch');
+            } else {
+                matchEl.classList.add('active', 'mismatch');
+                matchEl.classList.remove('match');
+            }
+        }
+
+        document.getElementById('confirmPassword').addEventListener('input', updatePasswordMatch);
+
+        function showCpMessage(message, type) {
+            try {
+                const msgEl = document.getElementById('cpMessage');
+                if (!msgEl) {
+                    console.error('cpMessage element not found');
+                    return;
+                }
+                msgEl.innerHTML = `<i class="fa-solid fa-${type === 'success' ? 'circle-check' : 'circle-exclamation'}"></i> ${message}`;
+                msgEl.className = `cp-message cp-message-${type}`;
+            } catch (error) {
+                console.error('Error showing message:', error);
+            }
+        }
+
+        async function handlePasswordUpdate() {
+            console.log('handlePasswordUpdate called');
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            console.log('Current password provided:', !!currentPassword);
+            console.log('New password provided:', !!newPassword);
+            console.log('Confirm password provided:', !!confirmPassword);
+            
+            // Validation
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                showCpMessage('Please fill in all fields', 'error');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showCpMessage('New passwords do not match', 'error');
+                return;
+            }
+            
+            if (newPassword.length < 8) {
+                showCpMessage('Password must be at least 8 characters', 'error');
+                return;
+            }
+            
+            if (!/[A-Z]/.test(newPassword) || !/[a-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
+                showCpMessage('Password must contain uppercase, lowercase, and number', 'error');
+                return;
+            }
+            
+            // Show loading state
+            const updateBtn = document.querySelector('.cp-btn-update');
+            const originalText = updateBtn.innerHTML;
+            updateBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Updating...';
+            updateBtn.disabled = true;
+            
+            try {
+                // Check if supabase is available
+                if (typeof supabase === 'undefined') {
+                    showCpMessage('Database not connected. Please refresh the page.', 'error');
+                    updateBtn.innerHTML = originalText;
+                    updateBtn.disabled = false;
+                    return;
+                }
+                
+                // Get current admin session
+                console.log('Getting session...');
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                
+                console.log('Session:', session);
+                console.log('Session error:', sessionError);
+                
+                if (sessionError) {
+                    showCpMessage('Session error: ' + sessionError.message, 'error');
+                    updateBtn.innerHTML = originalText;
+                    updateBtn.disabled = false;
+                    return;
+                }
+                
+                if (!session) {
+                    showCpMessage('Session expired. Please login again.', 'error');
+                    updateBtn.innerHTML = originalText;
+                    updateBtn.disabled = false;
+                    return;
+                }
+                
+                console.log('Updating password...');
+                
+                // Update password - try direct update first
+                const { error: updateError } = await supabase.auth.updateUser({
+                    password: newPassword
+                });
+                
+                console.log('Update error:', updateError);
+                
+                if (updateError) {
+                    // If direct update fails, try verifying current password first
+                    const email = session.user.email;
+                    console.log('Trying to verify with email:', email);
+                    
+                    const { error: signInError } = await supabase.auth.signInWithPassword({
+                        email: email,
+                        password: currentPassword
+                    });
+                    
+                    console.log('Sign in error:', signInError);
+                    
+                    if (signInError) {
+                        showCpMessage('Current password is incorrect', 'error');
+                        updateBtn.innerHTML = originalText;
+                        updateBtn.disabled = false;
+                        return;
+                    }
+                    
+                    // Try update again after verification
+                    const { error: retryError } = await supabase.auth.updateUser({
+                        password: newPassword
+                    });
+                    
+                    console.log('Retry error:', retryError);
+                    
+                    if (retryError) {
+                        showCpMessage(retryError.message, 'error');
+                    } else {
+                        showCpMessage('Password updated successfully!', 'success');
+                        setTimeout(() => {
+                            closeChangePasswordModal();
+                        }, 2000);
+                    }
+                } else {
+                    showCpMessage('Password updated successfully!', 'success');
+                    setTimeout(() => {
+                        closeChangePasswordModal();
+                    }, 2000);
+                }
+            } catch (error) {
+                console.error('Password update error:', error);
+                showCpMessage('Error: ' + error.message, 'error');
+            }
+            
+            updateBtn.innerHTML = originalText;
+            updateBtn.disabled = false;
+        }
+
+        // Close modal when clicking overlay
+        document.getElementById('changePasswordModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeChangePasswordModal();
+            }
+        });
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('changePasswordModal');
+                if (!modal.classList.contains('hidden')) {
+                    closeChangePasswordModal();
+                }
+            }
+        });
+        
+        // Allow Enter key to submit form
+        document.getElementById('confirmPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                handlePasswordUpdate();
+            }
+        });
     </script>
 </body>
 </html>
