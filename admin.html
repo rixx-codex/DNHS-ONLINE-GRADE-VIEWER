@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNHS ADMIN - GRADING SYSTEM</title>
+    <link rel="icon" type="image/png" href="dnhs-logo.jpg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="admin.css"> 
+</head>
+<body>
+
+    <div id="loadingOverlay" class="hidden">
+        <div class="loader-card">
+            <div class="spinner"></div>
+            <div class="loading-text">PROCESSING</div>
+            <p>Connecting to secure database...</p>
+        </div>
+    </div>
+
+    <div id="toast" class="sweet-toast">Action Successful!</div>
+    
+    <!-- Custom Confirmation Modal -->
+    <div id="confirmModal" class="confirm-modal hidden">
+        <div class="confirm-overlay"></div>
+        <div class="confirm-card">
+            <div class="confirm-icon">
+                <i class="fa-solid fa-circle-exclamation"></i>
+            </div>
+            <h3 class="confirm-title">Confirm Logout</h3>
+            <p class="confirm-message">Are you sure you want to sign out?</p>
+            <div class="confirm-actions">
+                <button id="confirmCancel" class="btn-cancel">Cancel</button>
+                <button id="confirmOk" class="btn-confirm">Sign Out</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div id="adminLoginSection" class="admin-card">
+            <div class="logo-container" style="text-align: center; margin-bottom: 20px;">
+                <img src="dnhs-logo.jpg" class="logo" alt="DNHS Logo" style="width: 80px; border-radius: 50%; border: 2px solid var(--primary);">
+            </div>
+            <div class="header" style="text-align: center; margin-bottom: 30px;">
+                <h3 style="font-weight: 800; letter-spacing: 1px;">ADMIN LOGIN</h3>
+                <p style="color: var(--text-dim); font-size: 0.8rem;">TVL-CSS Grading Management</p>
+            </div>
+            <div class="input-group">
+                <input type="email" id="adminEmail" placeholder=" " autocomplete="email">
+                <label>Administrator Email</label>
+            </div>
+            <div class="input-group">
+                <div class="password-container" style="position: relative; width: 100%;">
+                    <input type="password" id="adminPassword" placeholder=" " style="width: 100%; padding-right: 45px;">
+                    <label>Secure Password</label>
+                    <span id="togglePassword" onclick="togglePasswordVisibility()" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94a3b8;">
+                        <i id="eyeIcon" class="fa-solid fa-eye"></i>
+                    </span>
+                </div>
+            </div>
+            <button id="loginBtn" class="btn-save" onclick="handleAdminLogin()">SIGN IN</button>
+            <div class="forgot-password-container">
+                <button type="button" class="btn-forgot-password" onclick="openForgotPasswordModal()">
+                    <i class="fa-solid fa-key"></i> Forgot Password?
+                </button>
+            </div>
+        </div>
+
+        <!-- Forgot Password Modal -->
+        <div id="forgotPasswordModal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <h3>Reset Password</h3>
+                </div>
+                <p class="modal-description">Enter your administrator email and we'll send you a password reset link.</p>
+                <div class="input-group">
+                    <input type="email" id="resetEmail" placeholder=" ">
+                    <label>Administrator Email</label>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-cancel" onclick="closeForgotPasswordModal()">CANCEL</button>
+                    <button class="btn-reset" onclick="handleForgotPassword()">
+                        <i class="fa-solid fa-paper-plane"></i> SEND RESET LINK
+                    </button>
+                </div>
+                <div id="resetMessage" class="reset-message"></div>
+            </div>
+        </div>
+
+        <div id="encoderSection" class="admin-card hidden">
+            
+            <div class="top-bar">
+                <div class="admin-meta">
+                    <h2 class="dashboard-title">ADMIN DASHBOARD</h2>
+                    <p class="logged-in-text">
+                        <i class="fa-solid fa-circle-user"></i> 
+                    <span id="adminIdDisplay">...</span>
+                    </p>
+                </div>
+                <button class="logout-btn" onclick="handleLogout()">
+                    <i class="fa-solid fa-right-from-bracket"></i> LOGOUT
+                </button>
+            </div>
+
+            <div class="search-section">
+                <div class="search-row">
+                    <div class="input-group">
+                        <input type="text" id="searchLrn" placeholder=" " maxlength="12">
+                        <label>Retrieve via LRN</label>
+                    </div>
+                    <button class="btn-find" onclick="searchToEdit()">
+                        <i class="fa-solid fa-magnifying-glass"></i> FIND
+                    </button>
+                </div>
+                <div id="editIndicator" class="hidden">EDIT MODE: MODIFYING RECORD</div>
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="name" placeholder=" ">
+                <label>Student Full Name</label>
+            </div>
+            <div class="input-group">
+                <input type="text" id="lrn" placeholder=" " maxlength="12">
+                <label>LRN</label>
+            </div>
+
+            <div class="section-divider">
+                <span>Subject Grades</span>
+            </div>
+
+            <div class="grades-wrapper">
+                <div class="grade-item"><label>CSS</label><input type="number" id="css" placeholder="0"></div>
+                <div class="grade-item"><label>IMMERSION</label><input type="number" id="immersion" placeholder="0"></div>
+                <div class="grade-item"><label>CPAR</label><input type="number" id="cpar" placeholder="0"></div>
+                <div class="grade-item"><label>3IS</label><input type="number" id="three_is" placeholder="0"></div>
+                <div class="grade-item"><label>P.R-2</label><input type="number" id="pr2" placeholder="0"></div>
+                <div class="grade-item"><label>ENTREP</label><input type="number" id="entrep" placeholder="0"></div>
+                <div class="grade-item"><label>21ST CENTURY</label><input type="number" id="century21" placeholder="0"></div>
+                <div class="grade-item highlight-avg"><label>GEN. AVE.</label><input type="number" id="genAve" readonly placeholder="--"></div>
+            </div>
+
+            <div class="action-footer">
+                <button id="uploadBtn" class="btn-save" onclick="uploadData()">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> SAVE STUDENT RECORD
+                </button>
+                
+                <div class="secondary-actions">
+                    <button class="btn-new-entry" id="newEntryBtn" onclick="resetForm()">
+                        <i class="fa-solid fa-plus"></i> NEW ENTRY
+                    </button>
+                    
+                    <button id="deleteBtn" class="btn-delete hidden" onclick="confirmDelete()">
+                        <i class="fa-solid fa-trash-can"></i> DELETE RECORD
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <script src="auth.js"></script> 
+    <script src="admin.js"></script>
+    <script>
+        function togglePasswordVisibility() {
+            const pw = document.getElementById("adminPassword");
+            const icon = document.getElementById("eyeIcon");
+            pw.type = pw.type === "password" ? "text" : "password";
+            icon.classList.toggle("fa-eye");
+            icon.classList.toggle("fa-eye-slash");
+        }
+
+        function confirmDelete() {
+            if (confirm("Are you sure you want to delete this student record? This action cannot be undone.")) {
+                deleteRecord();
+            }
+        }
+    </script>
+</body>
+</html>

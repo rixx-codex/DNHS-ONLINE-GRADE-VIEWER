@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DNHS - Grade Portal</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="main-container">
+        
+        <div id="searchSection" class="glass-card animate-fade-in">
+            <div class="logo-container">
+                <img src="dnhs-logo.jpg" alt="DNHS Logo" class="logo floating">
+            </div>
+            
+            <div class="hero-text">
+                <h2 class="school-name">DARAGA NATIONAL HIGH SCHOOL</h2>
+                <p class="sub-title">GRADE 12-TVL CSS SY 2025-2026<br><span style="color: var(--sub-title); font-weight: 600;">ONLINE GRADE VIEWER</span></p>
+            </div>
+            
+            <div class="input-group">
+                <input type="number" id="lrnInput" placeholder="ENTER LRN ID" pattern="\d*" inputmode="numeric">
+                <button onclick="handleSearch()" id="searchBtn">GET GRADES</button>
+            </div>
+
+            <footer class="footer-area" style="margin-top: auto; padding-top: 20px; opacity: 0.7; font-size: 0.7rem; text-align: center;">
+                <p>© 2026 JAMES RIQ LONDONIO</p>
+                <span style="font-weight: 800; letter-spacing: 1px;">ALL RIGHTS RESERVED</span>
+            </footer>
+        </div>
+
+        <div id="gradeSection" class="glass-card hidden">
+            
+            <div id="comingSoonOverlay" class="hidden">
+                <div class="modal-content">
+                    <img src="lock.png" alt="Locked" style="width: 70px; margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(255,0,0,0.5));">
+                    <h2 style="color: #ff4d4d; font-size: 1.3rem; margin-bottom: 10px; font-weight: 800;">GRADES PENDING</h2>
+                    <p style="font-size: 0.85rem; color: white; margin-bottom: 20px; opacity: 0.9;">
+                        Encoding is currently in progress.<br>Please try again later.
+                    </p>
+                    <button onclick="window.location.reload()" class="btn-back">BACK</button>
+                </div>
+            </div>
+
+            <div class="logo-container">
+                <img src="dnhs-logo.jpg" class="logo small-logo">
+            </div>
+            
+            <div class="student-header animate-slide-down">
+                <span class="badge-role" style="background: var(--primary); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase;">TVL-CSS Student</span>
+                <h2 id="studentName" class="student-name" style="margin-top: 10px; color: lemonchiffon">--</h2>
+                <p id="studentLrn" class="student-lrn">LRN: --</p>
+            </div>
+
+            <div id="gradesWrapper" class="grade-content-area animate-fade-in">
+                <div class="grade-list-container">
+                    <div class="sub-item"><span>CSS</span> <b id="g-css">--</b></div>
+                    <div class="sub-item"><span>IMMERSION</span> <b id="g-immersion">--</b></div>
+                    <div class="sub-item"><span>CPAR</span> <b id="g-cpar">--</b></div>
+                    <div class="sub-item"><span>3IS</span> <b id="g-three_is">--</b></div>
+                    <div class="sub-item"><span>P.R-2</span> <b id="g-pr2">--</b></div>
+                    <div class="sub-item"><span>ENTREP</span> <b id="g-entrep">--</b></div>
+                    <div class="sub-item"><span>21ST CENTURY</span> <b id="g-century21">--</b></div>
+                </div>
+
+                <div class="average-section">
+                    <p class="label-ave">GENERAL AVERAGE</p>
+                    <h1 id="g-ave" class="glow-text">--</h1>
+                    <div id="statusBadge" class="badge-status">--</div>
+                </div>
+            </div>
+
+            <button class="btn-back" onclick="window.location.reload()" style="margin-top: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border);">CHECK ANOTHER</button>
+        </div>
+        
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

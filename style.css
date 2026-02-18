@@ -1,0 +1,242 @@
+/* --- RESET & FONTS --- */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+    --primary: #00B5FF;
+    --primary-glow: rgba(0, 174, 245, 0.4);
+    --glass: #1C1C1C94; /* Ginawa nating mas madilim para mas glassy */
+    --glass-border: rgba(255, 255, 255, 0.15);
+    --text-main: #ffffff;
+    --text-dim: rgba(255, 255, 255, 0.6);
+    --spring: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+    /* 1. PALITAN ANG URL SA BABA NG IYONG IMAGE PATH O LINK */
+    background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.75)), 
+                url('bg-image.png'); 
+    
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; /* Parang parallax effect, hindi gagalaw ang bg pag scroll */
+    
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    color: var(--text-main);
+    overflow-x: hidden;
+}
+
+/* --- MAIN CONTAINER --- */
+.main-container {
+    width: 100%;
+    max-width: 400px;
+    perspective: 1000px;
+}
+
+/* --- ULTRA GLASS CARD --- */
+.glass-card {
+    background: var(--glass);
+    /* Tinaasan ang blur para mas premium tingnan laban sa background image */
+    backdrop-filter: blur(35px) saturate(200%);
+    -webkit-backdrop-filter: blur(35px) saturate(200%);
+    border-radius: 35px;
+    padding: 35px 25px;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 600px;
+    animation: cardEntrance 0.8s var(--spring);
+}
+
+/* --- LOGO SYSTEM --- */
+.logo-container {
+    position: relative;
+    margin-bottom: 20px;
+    z-index: 10;
+}
+
+.logo {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid var(--glass-border);
+    background: #fff;
+    padding: 4px;
+    box-shadow: 0 0 20px var(--primary-glow);
+    transition: transform 0.5s var(--spring);
+}
+
+/* --- MODERN LRN INPUT BOX --- */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin: 30px 0;
+    width: 100%;
+}
+
+input#lrnInput {
+    width: 100%;
+    padding: 18px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.08); /* Mas lilitaw sa image background */
+    border: 1px solid var(--glass-border);
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 3px;
+    outline: none;
+    transition: all 0.4s var(--spring);
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+}
+
+input#lrnInput:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--primary);
+    box-shadow: 0 0 20px var(--primary-glow), inset 0 2px 10px rgba(0,0,0,0.2);
+    transform: translateY(-2px);
+}
+
+/* --- TEXT STYLES --- */
+.student-header {
+    z-index: 10;
+    margin-bottom: 20px;
+}
+
+h2.school-name, .student-name {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--primary);
+    text-shadow: 0 0 15px var(--primary-glow);
+}
+
+.student-lrn {
+    color: var(--text-dim);
+    font-weight: 600;
+    margin-top: 5px;
+}
+
+/* --- THE DYNAMIC BLUR --- */
+.blur-content {
+    filter: blur(12px);
+    opacity: 0.5;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* --- SUBJECTS LIST --- */
+.grade-list-container {
+    flex-grow: 1;
+    transition: filter 0.4s ease;
+}
+
+.sub-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-size: 14px;
+}
+
+/* --- AVERAGE SECTION --- */
+.average-section {
+    padding: 20px 0;
+    border-top: 1px solid var(--glass-border);
+    margin-top: 10px;
+    transition: filter 0.4s ease;
+}
+
+#g-ave {
+    font-size: 3.5rem;
+    font-weight: 900;
+    background: linear-gradient(to bottom, #fff, var(--primary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+/* --- FLOATING MODAL OVERLAY --- */
+#comingSoonOverlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.5); 
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    animation: fadeIn 0.4s ease;
+}
+
+.modal-content {
+    background: #1e293b;
+    width: 90%;
+    padding: 30px 20px;
+    border-radius: 28px;
+    border: 1px solid var(--primary);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    text-align: center;
+    animation: modalPop 0.5s var(--spring);
+}
+
+/* --- BUTTONS --- */
+button {
+    width: 100%;
+    padding: 18px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, var(--primary), #0081b8);
+    color: white;
+    font-weight: 800;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s var(--spring);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+button:hover { 
+    transform: translateY(-2px); 
+    box-shadow: 0 10px 20px var(--primary-glow); 
+}
+
+/* --- ANIMATIONS --- */
+@keyframes cardEntrance {
+    from { opacity: 0; transform: translateY(30px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes modalPop {
+    from { transform: scale(0.85) translateY(20px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.hidden { display: none !important; }
+
+@media (max-width: 380px) {
+    .glass-card { padding: 25px 18px; }
+    #g-ave { font-size: 2.8rem; }
+}
