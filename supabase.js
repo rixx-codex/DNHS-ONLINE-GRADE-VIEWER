@@ -10,6 +10,10 @@ const SUPABASE_KEY = "sb_publishable_C3KrBNMBWq5bpOgNAc6eTQ_p3BB1KAu";
 // Ito ang gagamitin natin sa lahat ng files (auth.js, admin.js, app.js)
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// 3. Make available globally for all files
+window.supabase = _supabase;
+window._supabase = _supabase;
+
 /**
  * HIGH-END WRAPPER: supabaseFetch
  * Ginagamit pa rin natin ito bilang fallback o para sa custom REST calls
@@ -46,7 +50,7 @@ async function supabaseFetch(endpoint, options = {}) {
  * High-end feature para malaman kung logged in pa ang admin
  */
 async function checkAuthState() {
-    const { data: { session }, error } = await _supabase.auth.getSession();
+    const { data: { session }, error } = await supabase.auth.getSession();
     
     // Kung nasa admin.html tayo at walang session, pilitin bumalik sa login state
     const isLoginPage = document.getElementById('adminLoginSection');
