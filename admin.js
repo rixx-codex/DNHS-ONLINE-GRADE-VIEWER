@@ -1,7 +1,7 @@
 let isEditMode = false;
 const subjectIds = ['css', 'immersion', 'cpar', 'three_is', 'pr2', 'entrep', 'century21'];
 
-// --- 1. TOGGLE LOADING HELPER (Full Screen Loader) ---
+// --- 1. TOGGLE LOADING HELPER ---
 function toggleLoading(show, text = "Processing...") {
     const loader = document.getElementById('loadingOverlay');
     const txtEl = document.querySelector('.loading-text');
@@ -55,18 +55,18 @@ async function searchToEdit() {
         if (error) throw error;
 
         if (data) {
-            // Fill up identity fields
+            // Identity fields base sa CSV structure
             document.getElementById('name').value = data.student_name || "";
             document.getElementById('lrn').value = data.access_code || "";
             
-            // Grades Mapping (Updated to match likely DB column names)
-            document.getElementById('css').value = data.css || data.CSS || "";
-            document.getElementById('immersion').value = data.immersion || data.IMMERSION || "";
-            document.getElementById('cpar').value = data.cpar || data.CPAR || "";
-            document.getElementById('three_is').value = data["3is"] || data["3IS"] || "";
-            document.getElementById('pr2').value = data.pr2 || data.PR2 || "";
-            document.getElementById('entrep').value = data.entrep || data.ENTREP || "";
-            document.getElementById('century21').value = data.century21 || data.CENTURY21 || "";
+            // Grades Mapping base sa eksaktong column names sa CSV mo
+            document.getElementById('css').value = data.CSS || "";
+            document.getElementById('immersion').value = data.IMMERSION || "";
+            document.getElementById('cpar').value = data.CPAR || "";
+            document.getElementById('three_is').value = data["3IS"] || "";
+            document.getElementById('pr2').value = data["P.R-2"] || ""; 
+            document.getElementById('entrep').value = data.ENTREP || "";
+            document.getElementById('century21').value = data["21ST CENTURY"] || "";
             
             computeAverage();
             
@@ -76,7 +76,6 @@ async function searchToEdit() {
             document.getElementById('deleteBtn').classList.remove('hidden');
             
             showToast("Record Found!");
-            document.getElementById('name').scrollIntoView({ behavior: 'smooth', block: 'center' });
         } else {
             showToast("No student found with that LRN", "error");
         }
@@ -87,7 +86,7 @@ async function searchToEdit() {
     }
 }
 
-// --- 4. SAVE OR UPDATE FUNCTION (The Error Fix is Here) ---
+// --- 4. SAVE OR UPDATE FUNCTION (THE BIG FIX) ---
 async function uploadData() {
     const studentName = document.getElementById('name').value.trim();
     const studentLrn = document.getElementById('lrn').value.trim();
@@ -96,18 +95,18 @@ async function uploadData() {
         return showToast("Name and LRN are required", "error");
     }
 
-    // UPDATED PAYLOAD: Lowercase keys to match standard Supabase column naming
+    // Payload keys na saktong kapareho ng nasa students.csv mo
     const payload = {
         student_name: studentName,
         access_code: studentLrn,
-        css: parseFloat(document.getElementById('css').value) || 0,
-        immersion: parseFloat(document.getElementById('immersion').value) || 0,
-        cpar: parseFloat(document.getElementById('cpar').value) || 0,
-        "3is": parseFloat(document.getElementById('three_is').value) || 0,
-        pr2: parseFloat(document.getElementById('pr2').value) || 0,
-        entrep: parseFloat(document.getElementById('entrep').value) || 0,
-        century21: parseFloat(document.getElementById('century21').value) || 0,
-        average: parseFloat(document.getElementById('genAve').value) || 0
+        CSS: parseFloat(document.getElementById('css').value) || 0,
+        IMMERSION: parseFloat(document.getElementById('immersion').value) || 0,
+        CPAR: parseFloat(document.getElementById('cpar').value) || 0,
+        "3IS": parseFloat(document.getElementById('three_is').value) || 0,
+        "P.R-2": parseFloat(document.getElementById('pr2').value) || 0,
+        ENTREP: parseFloat(document.getElementById('entrep').value) || 0,
+        "21ST CENTURY": parseFloat(document.getElementById('century21').value) || 0,
+        grade: parseFloat(document.getElementById('genAve').value) || 0
     };
 
     toggleLoading(true, isEditMode ? "Updating record..." : "Saving new record...");
@@ -126,7 +125,6 @@ async function uploadData() {
         if (!isEditMode) resetForm(); 
         
     } catch (e) {
-        // If error persists, it shows the exact column name causing the issue
         showToast("DB Error: " + e.message, "error");
     } finally {
         toggleLoading(false);
@@ -183,171 +181,17 @@ function showConfirmModal() {
         const modal = document.getElementById('confirmModal');
         const cancelBtn = document.getElementById('confirmCancel');
         const okBtn = document.getElementById('confirmOk');
-        
-        if (!modal) { resolve(true); return; } // Fallback if no modal
-        
+        if (!modal) { resolve(true); return; }
         modal.classList.remove('hidden');
-        
-        const handleCancel = () => {
-            modal.classList.add('hidden');
-            cancelBtn.removeEventListener('click', handleCancel);
-            okBtn.removeEventListener('click', handleOk);
-            resolve(false);
-        };
-        
-        const handleOk = () => {
-            modal.classList.add('hidden');
-            cancelBtn.removeEventListener('click', handleCancel);
-            okBtn.removeEventListener('click', handleOk);
-            resolve(true);
-        };
-        
-        cancelBtn.addEventListener('click', handleCancel);
-        okBtn.addEventListener('click', handleOk);
+        const handleCancel = () => { modal.classList.add('hidden'); resolve(false); };
+        const handleOk = () => { modal.classList.add('hidden'); resolve(true); };
+        cancelBtn.onclick = handleCancel;
+        okBtn.onclick = handleOk;
     });
 }
 
 // --- 9. INITIALIZE ---
 document.addEventListener('DOMContentLoaded', () => {
-    subjectIds.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('input', computeAverage);
-    });
-});
-
-// --- 4. SAVE OR UPDATE FUNCTION ---
-async function uploadData() {
-    const studentName = document.getElementById('name').value.trim();
-    const studentLrn = document.getElementById('lrn').value.trim();
-    
-    if (!studentName || !studentLrn) {
-        return showToast("Name and LRN are required", "error");
-    }
-
-    const payload = {
-        student_name: studentName,
-        access_code: studentLrn,
-        CSS: parseFloat(document.getElementById('css').value) || 0,
-        IMMERSION: parseFloat(document.getElementById('immersion').value) || 0,
-        CPAR: parseFloat(document.getElementById('cpar').value) || 0,
-        "3IS": parseFloat(document.getElementById('three_is').value) || 0,
-        PR2: parseFloat(document.getElementById('pr2').value) || 0,
-        ENTREP: parseFloat(document.getElementById('entrep').value) || 0,
-        CENTURY21: parseFloat(document.getElementById('century21').value) || 0,
-        average: parseFloat(document.getElementById('genAve').value) || 0
-    };
-
-    toggleLoading(true, isEditMode ? "Updating record..." : "Saving new record...");
-
-    try {
-        let result;
-        if (isEditMode) {
-            result = await supabase.from('students').update(payload).eq('access_code', studentLrn);
-        } else {
-            result = await supabase.from('students').insert([payload]);
-        }
-
-        if (result.error) throw result.error;
-
-        showToast(isEditMode ? "Record updated successfully!" : "New record saved!");
-        if (!isEditMode) resetForm(); 
-        
-    } catch (e) {
-        showToast(e.message, "error");
-    } finally {
-        toggleLoading(false);
-    }
-}
-
-// --- 5. DELETE FUNCTION ---
-async function deleteRecord() {
-    const lrn = document.getElementById('lrn').value;
-    if (!lrn) return;
-
-    toggleLoading(true, "Deleting record...");
-    try {
-        const { error } = await supabase.from('students').delete().eq('access_code', lrn);
-        if (error) throw error;
-        
-        showToast("Record deleted successfully");
-        resetForm();
-    } catch (e) {
-        showToast(e.message, "error");
-    } finally {
-        toggleLoading(false);
-    }
-}
-
-// --- 6. RESET FORM ---
-function resetForm() {
-    isEditMode = false;
-    // Clears all inputs inside admin-card
-    document.querySelectorAll('.admin-card input').forEach(i => i.value = "");
-    document.getElementById('editIndicator').classList.add('hidden');
-    document.getElementById('uploadBtn').innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> SAVE STUDENT RECORD';
-    document.getElementById('deleteBtn').classList.add('hidden');
-    document.getElementById('searchLrn').value = "";
-    computeAverage();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// --- 7. TOAST SYSTEM (Success/Error) ---
-function showToast(msg, type = 'success') {
-    const t = document.getElementById('toast');
-    if (!t) return;
-    t.innerText = msg;
-    t.style.borderLeft = `4px solid ${type === 'success' ? '#10b981' : '#ff4b2b'}`;
-    t.classList.add('active');
-    setTimeout(() => t.classList.remove('active'), 3000);
-}
-
-// --- 8. CUSTOM CONFIRMATION MODAL ---
-function showConfirmModal() {
-    return new Promise((resolve) => {
-        const modal = document.getElementById('confirmModal');
-        const cancelBtn = document.getElementById('confirmCancel');
-        const okBtn = document.getElementById('confirmOk');
-        
-        if (!modal || !cancelBtn || !okBtn) {
-            resolve(false);
-            return;
-        }
-        
-        // Show modal
-        modal.classList.remove('hidden');
-        
-        // Reset state
-        let resolved = false;
-        
-        const cleanup = () => {
-            if (resolved) return;
-            resolved = true;
-            modal.classList.add('hidden');
-            cancelBtn.removeEventListener('click', handleCancel);
-            okBtn.removeEventListener('click', handleOk);
-        };
-        
-        const handleCancel = () => {
-            cleanup();
-            resolve(false);
-        };
-        
-        const handleOk = () => {
-            cleanup();
-            resolve(true);
-        };
-        
-        cancelBtn.addEventListener('click', handleCancel);
-        okBtn.addEventListener('click', handleOk);
-    });
-}
-
-// Expose to global scope for auth.js
-window.showConfirmModal = showConfirmModal;
-
-// --- 8. INITIALIZE LISTENERS ---
-document.addEventListener('DOMContentLoaded', () => {
-    // Add event listeners to all subject inputs for real-time average computation
     subjectIds.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.addEventListener('input', computeAverage);
