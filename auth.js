@@ -36,9 +36,9 @@ async function handleAdminLogin() {
     btn.innerText = "VERIFYING...";
 
     try {
-        /* FIX: Ginamit ang _supabase (may underscore) 
+        /* FIX: Ginamit ang supabase
            dahil ito ang variable sa supabase.js mo */
-        const { data, error } = await _supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
             email: email,
             password: password
         });
@@ -63,8 +63,8 @@ window.handleAdminLogin = handleAdminLogin;
 
 // 3. Smooth Session Check & Transition
 async function checkUserSession() {
-    // FIX: _supabase gamit dito
-    const { data: { session } } = await _supabase.auth.getSession();
+    // FIX: supabase gamit dito
+    const { data: { session } } = await supabase.auth.getSession();
     
     const loginSection = document.getElementById('adminLoginSection');
     const encoderSection = document.getElementById('encoderSection');
@@ -107,8 +107,8 @@ async function handleLogout() {
     
     try {
         console.log("Calling supabase signOut...");
-        // FIX: _supabase gamit dito
-        const { data, error } = await _supabase.auth.signOut();
+        // FIX: supabase gamit dito
+        const { data, error } = await supabase.auth.signOut();
         
         console.log("SignOut response:", { data, error });
         
@@ -214,7 +214,7 @@ async function handleForgotPassword() {
     }
     
     try {
-        const { error } = await _supabase.auth.resetPasswordForEmail(email, {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
             redirectTo: window.location.origin + '/admin.html'
         });
         
