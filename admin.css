@@ -687,7 +687,7 @@ button {
 
 .cp-toggle-password {
     position: absolute;
-    right: 14px;
+    right: 35px;
     top: 50%;
     transform: translateY(-50%);
     background: none;
